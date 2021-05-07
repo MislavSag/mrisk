@@ -11,7 +11,6 @@
 #' @return Radf values; output from exuber package
 #' @import exuber
 #' @import data.table
-#' @import leanr
 #' @importFrom utils tail
 #' @examplea
 #' radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")

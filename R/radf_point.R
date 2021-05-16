@@ -40,9 +40,9 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
                                api_key = api_key,
                                limit = 1000)
     # prices <- ohlcv[, .(ct, ot, o, h, c, l, v)]
-    setnames(prices, 'ct', 'formated')
-    prices[, symbol := 'BTCUSD']
-    prices <- tail(prices, window)
+    setnames(ohlcv, 'ct', 'formated')
+    ohlcv[, symbol := 'BTCUSD']
+    prices <- tail(ohlcv, window)
   } else {
     ohlcv <- lapply(symbols, function(symbol) {
       lapply(seq_along(start_dates),

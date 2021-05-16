@@ -18,7 +18,7 @@
 radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, ...) {
 
   # solve No visible binding for global variable
-  formated <- NULL
+  formated <- symbol <- NULL
 
   # set start and end dates
   dots <- as.list(match.call()[-1L])
@@ -31,21 +31,35 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
   }
 
   # get market data
-  ohlcv <- lapply(symbols, function(symbol) {
-    lapply(seq_along(start_dates),
-           function(i) get_market_equities(symbol,
-                                           from = start_dates[i],
-                                           to = end_dates[i],
-                                           api_key = api_key))
-  })
-  prices <- lapply(ohlcv, rbindlist)
-  names(prices) <- symbols
-  prices <- rbindlist(prices, idcol = TRUE)
-  setnames(prices, ".id", "symbol")
-  prices <- unique(prices)
-  prices[, formated := as.POSIXct(formated)]
-  prices <- prices[format(formated, "%H:%M:%S") %between% c("10:00:00", "15:00:00")]
-  setorderv(prices, c("symbol", "formated"))
+  if (symbols == 'BTCUSD') {
+    ohlcv <- get_market_crypto(symbols,
+                               multiply = 1,
+                               time = 'h',
+                               from = as.character(as.Date(end_date) - 35),
+                               to = end_date,
+                               api_key = api_key,
+                               limit = 1000)
+    # prices <- ohlcv[, .(ct, ot, o, h, c, l, v)]
+    setnames(prices, 'ct', 'formated')
+    prices[, symbol := 'BTCUSD']
+    prices <- tail(prices, window)
+  } else {
+    ohlcv <- lapply(symbols, function(symbol) {
+      lapply(seq_along(start_dates),
+             function(i) get_market_equities(symbol,
+                                             from = start_dates[i],
+                                             to = end_dates[i],
+                                             api_key = api_key))
+    })
+    prices <- lapply(ohlcv, rbindlist)
+    names(prices) <- symbols
+    prices <- rbindlist(prices, idcol = TRUE)
+    setnames(prices, ".id", "symbol")
+    prices <- unique(prices)
+    prices[, formated := as.POSIXct(formated)]
+    prices <- prices[format(formated, "%H:%M:%S") %between% c("10:00:00", "15:00:00")]
+    setorderv(prices, c("symbol", "formated"))
+  }
 
   ################# DEOSTN WORK FOR MULTIPLE SYMBOLS ############
   # calculate exuber
@@ -61,5 +75,10 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
   result$id <- NULL
   return(result)
 }
-
-
+# symbols = 'BTCUSD'
+# symbols = 'SPY'
+# end_date = '2021-05-16'
+# window = 100
+# price_lag = 1L
+# use_log = 1
+# api_key = "15cd5d0adf4bc6805a724b4417bbaafc"

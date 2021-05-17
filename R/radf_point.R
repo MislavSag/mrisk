@@ -31,7 +31,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
   }
 
   # get market data
-  if (symbols == 'BTCUSD') {
+  if (symbols == 'BTCUSD' | symbols == 'btcusd') {
     ohlcv <- get_market_crypto(symbols,
                                multiply = 1,
                                time = 'h',

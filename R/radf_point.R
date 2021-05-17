@@ -40,7 +40,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
                                api_key = api_key,
                                limit = 1000)
     # prices <- ohlcv[, .(ct, ot, o, h, c, l, v)]
-    setnames(ohlcv, 'ct', 'formated')
+    data.table::setnames(ohlcv, 'ct', 'formated')
     ohlcv[, symbol := 'BTCUSD']
     prices <- tail(ohlcv, window)
   } else {
@@ -68,7 +68,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
   } else {
     close <- prices$c
   }
-  y <- radf(close, lag = price_lag)
+  y <- exuber::radf(close, lag = price_lag)
   stats <- exuber::tidy(y)
   bsadf <- data.table::last(exuber::augment(y))[, 4:5]
   result <- cbind(datetime = max(prices$formated), stats, bsadf)

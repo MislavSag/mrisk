@@ -7,7 +7,7 @@
 #' @param price_lag Number of price lags to use
 #' @param use_log Should log of prices be used
 #' @param api_key FMP cloud API key
-#' @param ... arguments for get_market_equities function
+#' @param time Time frequency
 #' @return Radf values; output from exuber package
 #' @import exuber
 #' @import data.table
@@ -15,15 +15,16 @@
 #' @examplea
 #' radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 #' radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
+#' radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
 #' @export
-radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, ...) {
+radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, time = "hour") {
 
   # solve No visible binding for global variable
   formated <- symbol <- NULL
 
   # set start and end dates
   dots <- as.list(match.call()[-1L])
-  if (!("time" %in% names(dots)) || dots$time == 'hour') {
+  if (time == 'hour') {
     start_dates <- seq.Date(as.Date(end_date) - (window / 4), as.Date(end_date) - 5, by = 5)
     if (tail(start_dates, 1) != (as.Date(end_date) - 5)) {
       start_dates <- c(start_dates, Sys.Date() - 5)
@@ -33,11 +34,11 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
 
   # get market data
   if (symbols == 'BTCUSD' | symbols == 'btcusd') {
-    if ("time" %in% names(dots) && dots$time == "hour") {
+    if (time == "hour") {
       time_crypto = "h"
       from_crypto = as.character(as.Date(end_date) - 35)
       to_crypto = end_date
-    } else if ("time" %in% names(dots) && dots$time == "minute") {
+    } else if (time == "minute") {
       time_crypto = "m"
       from_crypto = as.character(Sys.time() - 1000)
       to_crypto <- as.character(Sys.time())
@@ -84,7 +85,6 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
   result$id <- NULL
   return(result)
 }
-# api_key = "15cd5d0adf4bc6805a724b4417bbaafc"
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 # radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 # radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")

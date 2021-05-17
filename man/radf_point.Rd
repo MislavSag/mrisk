@@ -4,7 +4,15 @@
 \alias{radf_point}
 \title{Point radf}
 \usage{
-radf_point(symbols, end_date, window, price_lag, use_log, api_key, ...)
+radf_point(
+  symbols,
+  end_date,
+  window,
+  price_lag,
+  use_log,
+  api_key,
+  time = "hour"
+)
 }
 \arguments{
 \item{symbols}{Stock symbols}
@@ -19,7 +27,7 @@ radf_point(symbols, end_date, window, price_lag, use_log, api_key, ...)
 
 \item{api_key}{FMP cloud API key}
 
-\item{...}{arguments for get_market_equities function}
+\item{time}{Time frequency}
 }
 \value{
 Radf values; output from exuber package

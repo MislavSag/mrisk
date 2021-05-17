@@ -14,6 +14,7 @@
 #' @importFrom utils tail
 #' @examplea
 #' radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
+#' radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 #' @export
 radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, ...) {
 
@@ -32,14 +33,22 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
 
   # get market data
   if (symbols == 'BTCUSD' | symbols == 'btcusd') {
+    if ("time" %in% names(dots) && dots$time == "hour") {
+      time_crypto = "h"
+      from_crypto = as.character(as.Date(end_date) - 35)
+      to_crypto = end_date
+    } else if ("time" %in% names(dots) && dots$time == "minute") {
+      time_crypto = "m"
+      from_crypto = as.character(Sys.time() - 1000)
+      to_crypto <- as.character(Sys.time())
+    }
     ohlcv <- get_market_crypto(symbols,
                                multiply = 1,
-                               time = 'h',
-                               from = as.character(as.Date(end_date) - 35),
-                               to = end_date,
+                               time = time_crypto,
+                               from = from_crypto,
+                               to = to_crypto,
                                api_key = api_key,
                                limit = 1000)
-    # prices <- ohlcv[, .(ct, ot, o, h, c, l, v)]
     data.table::setnames(ohlcv, 'ct', 'formated')
     ohlcv[, symbol := 'BTCUSD']
     prices <- tail(ohlcv, window)
@@ -76,9 +85,13 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, .
   return(result)
 }
 # symbols = 'BTCUSD'
+# time =
 # symbols = 'SPY'
 # end_date = '2021-05-16'
 # window = 100
 # price_lag = 1L
 # use_log = 1
 # api_key = "15cd5d0adf4bc6805a724b4417bbaafc"
+# radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
+# radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
+# radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")

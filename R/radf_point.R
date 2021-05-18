@@ -11,6 +11,7 @@
 #' @return Radf values; output from exuber package
 #' @import exuber
 #' @import data.table
+#' @import httr
 #' @importFrom utils tail
 #' @examplea
 #' radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
@@ -39,7 +40,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
   if (symbols == 'BTCUSD' | symbols == 'btcusd') {
     if (time == "hour") {
       time_crypto = "h"
-      from_crypto = as.character(as.Date(end_date) - 35)
+      from_crypto = as.character(as.Date(end_date) - 20)
       to_crypto = end_date
     } else if (time == "minute") {
       time_crypto = "m"
@@ -82,12 +83,23 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
   } else {
     close <- prices$c
   }
+
+  # add newest data becuase FP cloud can't reproduce newst data that fast
+  nytime <- format(Sys.time(), tz="America/New_York", usetz=TRUE)
+  if (hour(nytime) > hour(max(prices$formated))) {
+    last_price <- GET(paste0("https://financialmodelingprep.com/api/v3/quote-short/", symbols, "?apikey=", api_key))
+    last_price <- content(last_price)[[1]]$price
+    close <- c(close, last_price)
+    max_datetime <- round.POSIXt(nytime, units = "hours")
+  } else {
+    max_datetime <- max(prices$formated)
+  }
   close <- close[(length(close)-window+1):length(close)]
   print(length(close))
   y <- exuber::radf(close[], lag = price_lag)
   stats <- exuber::tidy(y)
   bsadf <- data.table::last(exuber::augment(y))[, 4:5]
-  result <- cbind(datetime = max(prices$formated), stats, bsadf)
+  result <- cbind(datetime = max_datetime, stats, bsadf)
   result$id <- NULL
   return(result)
 }
@@ -100,5 +112,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
 # time = "hour"
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
-# radf_point("BTCUSD", Sys.Date()+1, 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
-# radf_point("BTCUSD", Sys.Date()+1, 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
+# radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
+# radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
+
+

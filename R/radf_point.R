@@ -43,7 +43,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
       to_crypto = end_date
     } else if (time == "minute") {
       time_crypto = "m"
-      from_crypto = as.character(Sys.time() - 100000)
+      from_crypto = as.character(Sys.time() - 40000)
       to_crypto <- as.character(Sys.time())
     }
     ohlcv <- get_market_crypto(symbols,

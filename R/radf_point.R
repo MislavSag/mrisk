@@ -24,7 +24,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
   formated <- symbol <- NULL
 
   # set start and end dates
-  dots <- as.list(match.call()[-1L])
+  # dots <- as.list(match.call()[-1L])
   if (time == 'hour') {
     start_dates <- seq.Date(as.Date(end_date) - (window / 4), as.Date(end_date) - 5, by = 5)
     if (tail(start_dates, 1) != (as.Date(end_date) - 5)) {
@@ -86,17 +86,21 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
 
   # add newest data becuase FP cloud can't reproduce newst data that fast
   nytime <- format(Sys.time(), tz="America/New_York", usetz=TRUE)
-  if (hour(nytime) > hour(max(prices$formated))) {
+  if (time == "hour" && hour(nytime) > hour(max(prices$formated))) {
     last_price <- GET(paste0("https://financialmodelingprep.com/api/v3/quote-short/", symbols, "?apikey=", api_key))
     last_price <- content(last_price)[[1]]$price
     close <- c(close, last_price)
     max_datetime <- round.POSIXt(nytime, units = "hours")
+  } else if (time == "minute" && minute(nytime) > minute(max(prices$formated))) {
+    last_price <- GET(paste0("https://financialmodelingprep.com/api/v3/quote-short/", symbols, "?apikey=", api_key))
+    last_price <- content(last_price)[[1]]$price
+    close <- c(close, last_price)
+    max_datetime <- round.POSIXt(nytime, units = "mins")
   } else {
     max_datetime <- max(prices$formated)
   }
   close <- close[(length(close)-window+1):length(close)]
-  print(length(close))
-  y <- exuber::radf(close[], lag = price_lag)
+  y <- exuber::radf(close, lag = price_lag)
   stats <- exuber::tidy(y)
   bsadf <- data.table::last(exuber::augment(y))[, 4:5]
   result <- cbind(datetime = max_datetime, stats, bsadf)
@@ -109,7 +113,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
 # price_lag = 1
 # use_log = 1
 # api_key = Sys.getenv("APIKEY")
-# time = "hour"
+# time = "minute"
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
 # radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")

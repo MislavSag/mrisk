@@ -115,7 +115,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
 # api_key = Sys.getenv("APIKEY")
 # time = "minute"
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
-radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
+# radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
 # radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 # radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
 

@@ -71,8 +71,10 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
     prices <- rbindlist(prices, idcol = TRUE)
     setnames(prices, ".id", "symbol")
     prices <- unique(prices)
-    prices[, formated := as.POSIXct(formated)]
-    prices <- prices[format(formated, "%H:%M:%S") %between% c("10:00:00", "15:00:00")]
+    prices[, formated := as.POSIXct(formated, tz = "EST")]
+    if (time == "hour") {
+      prices <- prices[format(formated, "%H:%M:%S") %between% c("10:00:00", "15:00:00")]
+    }
     setorderv(prices, c("symbol", "formated"))
   }
 
@@ -118,5 +120,3 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
 # radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 # radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
-
-

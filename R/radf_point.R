@@ -105,8 +105,8 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
   y <- exuber::radf(close, lag = price_lag)
   stats <- exuber::tidy(y)
   bsadf <- data.table::last(exuber::augment(y))[, 4:5]
-  max_datetime <- as.POSIXct(as.character(max_datetime))
-  attributes(max_datetime)$tzone <- 'EST'
+  max_datetime <- as.POSIXct(as.character(max_datetime), tz = 'EST')
+  attributes(max_datetime)$tzone <- 'UCT'
   result <- cbind(datetime = max_datetime, stats, bsadf)
   result$id <- NULL
   return(result)

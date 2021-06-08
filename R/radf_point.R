@@ -26,7 +26,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
   # set start and end dates
   # dots <- as.list(match.call()[-1L])
   if (time == 'hour') {
-    start_dates <- seq.Date(as.Date(end_date) - (window / 4), as.Date(end_date) - 5, by = 5)
+    start_dates <- seq.Date(as.Date(end_date) - (window / 3), as.Date(end_date) - 5, by = 5)
     if (tail(start_dates, 1) != (as.Date(end_date) - 5)) {
       start_dates <- c(start_dates, Sys.Date() - 5)
     }
@@ -117,7 +117,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
 # price_lag = 1
 # use_log = 1
 # api_key = Sys.getenv("APIKEY")
-# time = "minute"
+# time = "hour"
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")
 # radf_point("AAPL", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "minute")
 # radf_point("BTCUSD", Sys.Date(), 100, 1, TRUE, Sys.getenv("APIKEY"), time = "hour")

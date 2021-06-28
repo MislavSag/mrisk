@@ -91,12 +91,20 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
   if (time == "hour" && hour(nytime) > hour(max(prices$formated))) {
     last_price <- GET(paste0("https://financialmodelingprep.com/api/v3/quote-short/", symbols, "?apikey=", api_key))
     last_price <- content(last_price)[[1]]$price
-    close <- c(close, last_price)
+    if (use_log) {
+      close <- c(close, log(last_price))
+    } else {
+      close <- c(close, last_price)
+    }
     max_datetime <- round.POSIXt(nytime, units = "hours")
   } else if (time == "minute" && minute(nytime) > minute(max(prices$formated))) {
     last_price <- GET(paste0("https://financialmodelingprep.com/api/v3/quote-short/", symbols, "?apikey=", api_key))
     last_price <- content(last_price)[[1]]$price
-    close <- c(close, last_price)
+    if (use_log) {
+      close <- c(close, log(last_price))
+    } else {
+      close <- c(close, last_price)
+    }
     max_datetime <- round.POSIXt(nytime, units = "mins")
   } else {
     max_datetime <- max(prices$formated)
@@ -111,7 +119,7 @@ radf_point <- function(symbols, end_date, window, price_lag, use_log, api_key, t
   result$id <- NULL
   return(result)
 }
-# symbols = "AAPL"
+# symbols = "SPY"
 # end_date = as.character(Sys.Date())
 # window = 100
 # price_lag = 1
